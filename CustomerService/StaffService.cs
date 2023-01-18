@@ -10,22 +10,19 @@ namespace AllServices
 {
     public class StaffService
     {
-
         
-        public static void CreateCustomerAccount(string firstName, string lastName,string email, string password, Bank Bank)
+        public static void CreateCustomerAccount(string firstName, string lastName,string email, string password, Bank bank)
         {
-            Customer newCustomerAccount = new(firstName, lastName, email, password,Bank.Name);
+            Customer newCustomerAccount = new(firstName, lastName, email, password,bank.Name);
 
-            Bank.CustomerAccounts.Add(newCustomerAccount.ID, newCustomerAccount);
+            bank.CustomerAccounts.Add(newCustomerAccount.ID, newCustomerAccount);
 
         }
-
         
-        public static void DeleteAccount(Bank Bank,string accountIDToDelete)
+        public static void DeleteAccount(Bank bank,string accountIDToDelete)
         { 
-            Bank.CustomerAccounts.Remove(accountIDToDelete);
+            bank.CustomerAccounts.Remove(accountIDToDelete);
         }
-
 
       
         public static void AddServiceChargeForTransferringBank(Bank staffBank, double updatedRTGSChargeToOtherBank, double updatedIMPSChargeToOtherBank)
@@ -35,10 +32,10 @@ namespace AllServices
         }
 
         
-        public static void AddServiceChargeForSameBank(Bank Bank, double updatedRTGSCharge, double updatedIMPSCharge)
+        public static void AddServiceChargeForSameBank(Bank bank, double updatedRTGSCharge, double updatedIMPSCharge)
         {
-            Bank.RTGSCharge = updatedRTGSCharge;
-            Bank.IMPSCharge = updatedIMPSCharge;
+            bank.RTGSCharge = updatedRTGSCharge;
+            bank.IMPSCharge = updatedIMPSCharge;
          }
 
         
@@ -63,9 +60,9 @@ namespace AllServices
         }
 
         
-        public static Customer GetAccount(Bank receiversBank, string AccountID)
+        public static Customer GetAccount(Bank receiversBank, string accountID)
         {
-            return receiversBank.CustomerAccounts[AccountID];
+            return receiversBank.CustomerAccounts[accountID];
         }
     }
 }

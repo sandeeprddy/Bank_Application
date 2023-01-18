@@ -10,17 +10,18 @@ namespace Models
     {
         public double Balance { get; set; }
 
-        public Dictionary<string, Transaction> Transactions = new Dictionary<string, Transaction>();
+        public Dictionary<string, Transaction> Transactions = new();
 
-        public Customer(string FirstName, string LastName, string Email, string Password, string BankName)
+        public Customer(string firstName, string lastName, string email, string password, string bankName)
         {
-            this.ID = FirstName[..3] + DateTime.Now.ToString("");
-            this.FirstName = FirstName;
-            this.LastName = LastName;
-            this.Email = Email;
-            this.Password = Password;
-            this.BankName = BankName;
+            this.ID = firstName[..3] + DateTime.Now.ToString("");
+            this.FirstName = firstName;
+            this.LastName = lastName;
+            this.Email = email;
+            this.Password = password;
+            this.BankName = bankName;
             this.Balance = 0;
         }
+    
     }
 }

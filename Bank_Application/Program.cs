@@ -1,5 +1,6 @@
 ﻿using Models;
 using AllServices;
+using Bank_Application;
 
 Dictionary<string, Bank> AllBanks = new();
 
@@ -618,6 +619,7 @@ void TransferAmount(Customer sender)
     }
 
 }
+
 void DisplayTransactionTypes()
 {
     int i = 1;
@@ -652,28 +654,28 @@ void SelectTransactionType(ref string transactionType)
     }
 }
 
-void GenerateTransactionCharge(ref double transactionCharge, string senderBankName, string receiversBankName,string transactionType,double moneyToTransfer, Bank SenderBank)
+void GenerateTransactionCharge(ref double transactionCharge, string senderBankName, string receiversBankName,string transactionType,double moneyToTransfer, Bank senderBank)
 {
     if (senderBankName == receiversBankName)
     {
         if (transactionType == "RTGS")
         {
-            transactionCharge = (SenderBank.RTGSCharge) * moneyToTransfer;
+            transactionCharge = (senderBank.RTGSCharge) * moneyToTransfer;
         }
         else if (transactionType == "IMPS")
         {
-            transactionCharge = (SenderBank.IMPSCharge) * moneyToTransfer;
+            transactionCharge = (senderBank.IMPSCharge) * moneyToTransfer;
         }
     }
     else
     {
         if (transactionType == "RTGS")
         {
-            transactionCharge = (SenderBank.TransferRTGSCharge) * moneyToTransfer;
+            transactionCharge = (senderBank.TransferRTGSCharge) * moneyToTransfer;
         }
         else if (transactionType == "IMPS")
         {
-            transactionCharge = (SenderBank.TransferIMPSCharge) * moneyToTransfer;
+            transactionCharge = (senderBank.TransferIMPSCharge) * moneyToTransfer;
         }
 
     }
@@ -753,11 +755,11 @@ void UpdateAccount(Bank staffBank)
     }
 }
 
-void AddCurrencyToAcceptedCurrencies(string BankID)
+void AddCurrencyToAcceptedCurrencies(string bankID)
 {
     Console.WriteLine("Existing Accepted currencies and their exchange values to Rupee are ");
 
-    AdminServices.DisplayAcceptedCurrencies(BankID, AllBanks);
+    AdminServices.DisplayAcceptedCurrencies(bankID, AllBanks);
 
     Console.WriteLine("Enter the Code of new Currency(Three letter code)");
 
@@ -767,7 +769,7 @@ void AddCurrencyToAcceptedCurrencies(string BankID)
 
     double currencyExchangeValue = Convert.ToDouble(Console.ReadLine());
 
-    AdminServices.AddCurrencyToAcceptedCurrencies(BankID, AllBanks, currencyCode, currencyExchangeValue);
+    AdminServices.AddCurrencyToAcceptedCurrencies(bankID, AllBanks, currencyCode, currencyExchangeValue);
 
     Console.WriteLine("New Accepted currency added successfully");
 

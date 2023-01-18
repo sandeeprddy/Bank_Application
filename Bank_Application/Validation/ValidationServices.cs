@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Models;
 
-namespace AllServices
+namespace Bank_Application
 {
     public class ValidationServices
     {
@@ -18,21 +18,21 @@ namespace AllServices
         }
 
         
-        public static Boolean ValidateBank(string BankName, Dictionary<string, Bank> AllBanks)
+        public static Boolean ValidateBank(string bankName, Dictionary<string, Bank> allBanks)
         {
-            return (AllBanks.ContainsKey(BankName.ToUpper()));
+            return (allBanks.ContainsKey(bankName.ToUpper()));
         }
 
         
-        public static Boolean ValidateAccount(Bank currentUsersBank, string AccountID)
+        public static Boolean ValidateAccount(Bank currentUsersBank, string accountID)
         {
-            return (currentUsersBank.CustomerAccounts.ContainsKey(AccountID));
+            return (currentUsersBank.CustomerAccounts.ContainsKey(accountID));
         }
 
         
-        public static Boolean ValidateStaff(string Id, string password, Bank Bank)
+        public static Boolean ValidateStaff(string Id, string password, Bank bank)
         {
-            return (Bank.StaffAccounts.ContainsKey(Id) && Bank.StaffAccounts[Id].Password == password);
+            return (bank.StaffAccounts.ContainsKey(Id) && bank.StaffAccounts[Id].Password == password);
         }
 
         
@@ -51,9 +51,9 @@ namespace AllServices
         }
 
         
-        public static Boolean ValidateBankCurrency(string BankId, Dictionary<string, Bank> AllBanks, string currency)
+        public static Boolean ValidateBankCurrency(string BankId, Dictionary<string, Bank> allBanks, string currency)
         {
-            return (AllBanks[BankId].AcceptedCurrencies.ContainsKey(currency.ToUpper()));
+            return (allBanks[BankId].AcceptedCurrencies.ContainsKey(currency.ToUpper()));
         }
 
         public static Boolean ValidateTransaction(Customer customer, string transactionId)

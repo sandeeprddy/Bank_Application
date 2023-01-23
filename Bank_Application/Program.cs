@@ -187,7 +187,7 @@ void LoginAsStaff()
                 InputAndValidateAccount(staffBank,ref senderAccountId);
 
                 Customer sender = staffBank.CustomerAccounts[senderAccountId];
-
+/*
                 Console.WriteLine("Enter Receiver's Bank Name");
 
                 string receiverBankName = "";
@@ -203,8 +203,8 @@ void LoginAsStaff()
                 InputAndValidateAccount(receiverBank,ref receiverAccountId);
 
                 Customer receiver = receiverBank.CustomerAccounts[receiverAccountId];
-
-                RevertTransaction(sender, receiver);
+*/
+                RevertTransaction(sender);
 
                 break;
 
@@ -795,7 +795,7 @@ void AddServiceChargeForTransferringBank(Bank staffBank)
    Console.WriteLine("Charges updates successfully");
 }
 
-void RevertTransaction(Customer sender, Customer receiver)
+void RevertTransaction(Customer sender)
 {
 
     Console.WriteLine("List of Transactions of" + sender.FirstName + "are \n");
@@ -813,6 +813,7 @@ void RevertTransaction(Customer sender, Customer receiver)
     while (!ValidationServices.ValidateTransaction(sender, senderTransactionId))
     {
         Console.WriteLine("Enter valid transaction id");
+
         senderTransactionId = Console.ReadLine();
     }
 
@@ -823,28 +824,10 @@ void RevertTransaction(Customer sender, Customer receiver)
     Console.WriteLine("Successfully reverted transaction in " + sender.FirstName);
 
     //revert receiver transaction id
+ 
+    string receiverTransactionId = SenderTransaction.ReceiverTransactionID;
 
-    Console.WriteLine("Reverting the transaction in Receivers Account");
-
-    Console.WriteLine("List of Transactions of" + receiver.FirstName + "are\n");
-
-    foreach (Transaction transactions in receiver.Transactions.Values)
-    {
-        if (transactions.Sender == sender)
-        {
-            Console.WriteLine(transactions.Id);
-        }
-    };
-
-    Console.WriteLine("\nEnter transaction ID");
-
-    string receiverTransactionId = Console.ReadLine();
-
-    while (!ValidationServices.ValidateTransaction(receiver, receiverTransactionId))
-    {
-        Console.WriteLine("Enter valid transaction id");
-        receiverTransactionId = Console.ReadLine();
-    }
+    Customer receiver = SenderTransaction.Receiver;
 
     Transaction ReceiverTransaction = receiver.Transactions[receiverTransactionId];
 

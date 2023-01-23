@@ -15,12 +15,15 @@ namespace Models
 
         public string TransactionInfo { get; set; }
 
-        public Transaction(string id, Customer sender, Customer receiver, double moneyTransferred)
+        public string ReceiverTransactionID { get; set; }
+
+        public Transaction(string id, Customer sender, Customer receiver, double moneyTransferred, String receiverTransactionID)
         {
             Id = id;
             Sender = sender;
             Receiver = receiver;
             MoneyTransferred = moneyTransferred;
+            this.ReceiverTransactionID = receiverTransactionID;
         }
     }
 }

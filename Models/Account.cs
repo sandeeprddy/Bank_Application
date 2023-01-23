@@ -16,5 +16,6 @@ namespace Models
 
         public string? BankName { get; set; }
 
+
     }
 }

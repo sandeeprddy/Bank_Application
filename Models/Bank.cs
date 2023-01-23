@@ -29,7 +29,7 @@ namespace Models
 
         public IDictionary<string, Customer> CustomerAccounts { get; set; }
 
-        public IDictionary<string, string> SenderRecieverTransactionsMapping { get; set; }
+       // public IDictionary<string, string> SenderRecieverTransactionsMapping { get; set; }
 
         public Bank(string Name, string Location) 
         { 
@@ -48,7 +48,7 @@ namespace Models
                 { "EUR", 90}
             };
 
-            SenderRecieverTransactionsMapping = new Dictionary<string, string>();
+           //SenderRecieverTransactionsMapping = new Dictionary<string, string>();
         }
     }
 }

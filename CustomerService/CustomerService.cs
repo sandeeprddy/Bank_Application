@@ -77,9 +77,9 @@ namespace AllServices
 
             string ReceiverTransactionID = "TXN" + (receiverBank).ID + receiver.ID + DateTime.Now.ToString("");
 
-            Transaction SenderTransaction = new(SenderTransactionID, sender, receiver, senderAccountAmountDebited);
-
-            Transaction ReceiverTransaction = new(ReceiverTransactionID, sender, receiver, receiverAccountAmountCredited);
+            Transaction SenderTransaction = new(SenderTransactionID, sender, receiver, senderAccountAmountDebited, ReceiverTransactionID);
+           
+            Transaction ReceiverTransaction = new(ReceiverTransactionID, sender, receiver, receiverAccountAmountCredited, SenderTransactionID);
 
             sender.Transactions.Add(SenderTransactionID, SenderTransaction);
 
@@ -93,12 +93,6 @@ namespace AllServices
 
             receiver.Transactions[ReceiverTransactionID].TransactionInfo = receiverTransactionInfo;
 
-            senderBank.SenderRecieverTransactionsMapping.Add(SenderTransactionID, ReceiverTransactionID);
-
-            if (senderBank.Name != receiverBank.Name)
-            {
-                receiverBank.SenderRecieverTransactionsMapping.Add(SenderTransactionID, ReceiverTransactionID);
-            }
         }
     }
 

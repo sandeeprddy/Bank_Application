@@ -23,13 +23,9 @@ namespace Models
         public string currency = "INR";
 
         public IDictionary<string, double> AcceptedCurrencies { get; set; }
+        public IDictionary<string, User> AllUsers { get; set; }
+        public IDictionary<string, Account>  AllAccounts { get; set; }
 
-
-        public IDictionary<string, Staff> StaffAccounts { get;set; }
-
-        public IDictionary<string, Customer> CustomerAccounts { get; set; }
-
-       // public IDictionary<string, string> SenderRecieverTransactionsMapping { get; set; }
 
         public Bank(string Name, string Location) 
         { 
@@ -37,9 +33,9 @@ namespace Models
            this.Name = Name;
            this.Location = Location;
 
-            StaffAccounts = new Dictionary<string, Staff>();
+            AllAccounts = new Dictionary<string, Account>();
 
-            CustomerAccounts = new Dictionary<string, Customer>();
+            AllUsers = new Dictionary<string, User>();
 
             AcceptedCurrencies = new Dictionary<string, double>
             {
@@ -48,7 +44,6 @@ namespace Models
                 { "EUR", 90}
             };
 
-           //SenderRecieverTransactionsMapping = new Dictionary<string, string>();
         }
     }
 }

@@ -8,13 +8,19 @@ namespace Models
 {
     public class Account
     {
-        public string? ID { get; set; }
-        public string? FirstName { get; set; }
-        public string? LastName { get; set; }
-        public string? Email { get; set; }
-        public string? Password { get; set; }
+        public string ID { get; set; }
+        public double Balance { get; set; }
 
-        public string? BankName { get; set; }
+        public Dictionary<string, Transaction> Transactions;
+
+        public Account(string firstName)
+        {
+            this.ID = firstName[..2] + DateTime.Now.ToString("");
+            
+            this.Balance = 0;
+
+            Transactions = new Dictionary<string, Transaction>();
+        }
 
 
     }

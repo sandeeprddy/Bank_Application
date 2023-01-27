@@ -1,6 +1,7 @@
 ﻿using Models;
 using AllServices;
 using Bank_Application;
+using Models.Enum_Types;
 
 Dictionary<string, Bank> AllBanks = new();
 
@@ -76,13 +77,17 @@ void LoginAsAccountHolder()
 
     Bank currentUsersBank = AllBanks[key : BankName];
 
-    Console.WriteLine("Please Enter your Account ID");
+    string CustomerID = "";
 
-    string AccountID = "";
+    InputAndValidateCustomer(currentUsersBank, ref CustomerID);
 
-    InputAndValidateAccount(currentUsersBank, ref AccountID);
+    User currentCustomer = currentUsersBank.AllUsers[CustomerID];
 
-    Customer currentUsersAccount = currentUsersBank.CustomerAccounts[AccountID];
+    string currentAccountID = "";
+
+    InputAndValidateAccountId(currentCustomer, ref currentAccountID);
+
+    Account currentCustomerAccount = currentUsersBank.AllAccounts[currentAccountID]; 
 
     Boolean isCustomerSessionComplete = false;
     
@@ -97,20 +102,20 @@ void LoginAsAccountHolder()
             case "1":
                 Console.WriteLine("Enter amount to deposit");
                 double moneyToDeposit = Convert.ToDouble(Console.ReadLine());
-                CustomerService.Deposit(currentUsersAccount,moneyToDeposit);
+                CustomerService.Deposit(currentCustomerAccount,moneyToDeposit);
                 Console.WriteLine("Amount deposited successfully");
-                Console.WriteLine("Current Balance :" + currentUsersAccount.Balance + "" + currentUsersBank.currency);
+                Console.WriteLine("Current Balance :" + currentCustomerAccount.Balance + "" + currentUsersBank.currency);
                 break;
             case "2":
-                WithdrawAmount(currentUsersAccount);
+                WithdrawAmount(currentCustomerAccount);
                 break;
             case "3":
-                TransferAmount(currentUsersAccount);
+                TransferAmount(currentCustomer,currentCustomerAccount);
                 Console.WriteLine("Amount transferred successfully");
-                Console.WriteLine("Current Balance :" + currentUsersAccount.Balance);
+                Console.WriteLine("Current Balance :" + currentCustomerAccount.Balance);
                 break;
             case "4":
-                CustomerService.ViewTransaction(currentUsersAccount);
+                CustomerService.ViewTransaction(currentCustomerAccount);
                 break;
             case "5": 
                 isCustomerSessionComplete=true; 
@@ -126,7 +131,7 @@ void LoginAsStaff()
 
     string staffBankName = null;
     Bank staffBank = null;
-    Staff staffAccount = null;
+    User staffAccount = null;
 
     InputAndValidateStaff(ref staffBankName,ref staffBank, ref staffAccount);
 
@@ -148,15 +153,11 @@ void LoginAsStaff()
                 break;
 
             case "2":
-                UpdateAccount(staffBank);
+                UpdateCustomer(staffBank);
                 break;
 
             case "3":
-                Console.WriteLine("Enter ID of Account to delete");
-                string accountIDToDelete = "";
-                InputAndValidateAccount(staffBank, ref accountIDToDelete);
-                StaffService.DeleteAccount(staffBank,accountIDToDelete);
-                Console.WriteLine("Account deleted successfully");
+                DeleteAccount(staffBank);
                 break;
 
             case "4":
@@ -171,40 +172,33 @@ void LoginAsStaff()
                 AddServiceChargeForTransferringBank(staffBank);
                 break;
 
-            case "7": 
-                Console.WriteLine("Enter the account ID");
+            case "7":
+                Console.WriteLine("Please Enter Customer ID");
+                string CustomerID = "";
+                InputAndValidateCustomer(staffBank, ref CustomerID);
+                User currentCustomer = staffBank.AllUsers[CustomerID];
                 string customerAccountIDToViewTransactions = "";
-                InputAndValidateAccount(staffBank,ref customerAccountIDToViewTransactions);
-                StaffService.ViewTransaction(staffBank.CustomerAccounts[customerAccountIDToViewTransactions]);
+                InputAndValidateAccountId(currentCustomer, ref customerAccountIDToViewTransactions);
+                StaffService.ViewTransaction(staffBank.AllAccounts[customerAccountIDToViewTransactions]);
                 break;
 
             case "8":
 
                 Console.WriteLine("Enter customers Ids participated in the transaction");
 
-                string senderAccountId = "";
+                string senderId = "";
 
-                InputAndValidateAccount(staffBank,ref senderAccountId);
+                InputAndValidateCustomer(staffBank, ref senderId);
 
-                Customer sender = staffBank.CustomerAccounts[senderAccountId];
-/*
-                Console.WriteLine("Enter Receiver's Bank Name");
+                User sender = staffBank.AllUsers[senderId];
 
-                string receiverBankName = "";
+                string senderAccountID = "";
+                
+                InputAndValidateAccountId(sender, ref senderAccountID);
 
-                InputAndValidateBank(ref receiverBankName);
+                Account senderAccount = staffBank.AllAccounts[senderAccountID];
 
-                Bank receiverBank = AllBanks[receiverBankName];
-
-                Console.WriteLine("Enter receiver Account Id");
-
-                string receiverAccountId = "";
-
-                InputAndValidateAccount(receiverBank,ref receiverAccountId);
-
-                Customer receiver = receiverBank.CustomerAccounts[receiverAccountId];
-*/
-                RevertTransaction(sender);
+                RevertTransaction(senderAccount);
 
                 break;
 
@@ -304,7 +298,7 @@ void InputAndValidateBank(ref string BankName)
     }
 }
 
-void InputAndValidateStaff(ref string staffBankName, ref Bank staffBank, ref Staff staffAccount)
+void InputAndValidateStaff(ref string staffBankName, ref Bank staffBank, ref User staffAccount)
 {
 
     bool validStaffCredentials = false;
@@ -323,7 +317,7 @@ void InputAndValidateStaff(ref string staffBankName, ref Bank staffBank, ref Sta
 
         if (ValidationServices.ValidateStaff(staffID, staffPassword, staffBank)) 
         {
-                staffAccount = staffBank.StaffAccounts[staffID];
+                staffAccount = staffBank.AllUsers[staffID];
                 Console.WriteLine("Welcome " + staffAccount.FirstName);
                 validStaffCredentials = true;
         }
@@ -503,17 +497,20 @@ void ViewAllStaff()
 
     int i = 1;
 
-    foreach (KeyValuePair<string, Staff> staff in Bank.StaffAccounts)
+    foreach (KeyValuePair<string, User> user in Bank.AllUsers)
     {
-        Console.WriteLine("staff No." + i);
-        Console.WriteLine("\n\n");
-        Console.WriteLine("                     Account ID : " + staff.Value.ID);
-        Console.WriteLine("                     First Name : " + staff.Value.FirstName);
-        Console.WriteLine("                     Last Name : " + staff.Value.LastName);
-        Console.WriteLine("                     Email : " + staff.Value.Email);
+        if (user.Value.UserType.Equals(UserTypes.Types.Staff))
+        {
+            Console.WriteLine("staff No." + i);
+            Console.WriteLine("\n\n");
+            Console.WriteLine("                     Account ID : " + user.Value.ID);
+            Console.WriteLine("                     First Name : " + user.Value.FirstName);
+            Console.WriteLine("                     Last Name : " + user.Value.LastName);
+            Console.WriteLine("                     Email : " + user.Value.Email);
 
-        Console.WriteLine("\n\n");
-        i++;
+            Console.WriteLine("\n\n");
+            i++;
+        }
     }
 }
 
@@ -522,53 +519,94 @@ void ViewAllCustomers(Bank staffBank)
 
     int i = 1;
 
-    foreach (KeyValuePair<string, Customer> customer in staffBank.CustomerAccounts)
+    foreach (KeyValuePair<string, User> user in staffBank.AllUsers)
     {
-        Console.WriteLine("Customer No." + i);
-        Console.WriteLine("\n\n");
-        Console.WriteLine("                     Account ID : " + customer.Value.ID);
-        Console.WriteLine("                     First Name : " + customer.Value.FirstName);
-        Console.WriteLine("                     Last Name : " + customer.Value.LastName);
-        Console.WriteLine("                     Email : " + customer.Value.Email);
+        if (user.Value.UserType.Equals(UserTypes.Types.Customer))
+        {
+            Console.WriteLine("Customer No." + i);
+            Console.WriteLine("\n\n");
+            Console.WriteLine("                     Account ID : " + user.Value.ID);
+            Console.WriteLine("                     First Name : " + user.Value.FirstName);
+            Console.WriteLine("                     Last Name : " + user.Value.LastName);
+            Console.WriteLine("                     Email : " + user.Value.Email);
+            Console.WriteLine("Accounts of " + user.Value.FirstName + "are");
 
-        Console.WriteLine("\n\n");
-        i++;
+            int j = 1;
+
+            foreach (string accountIds in user.Value.AccountIDs)
+            {
+               Account account = staffBank.AllAccounts[accountIds];
+                Console.WriteLine("Account No." + j);
+                Console.WriteLine("\n\n");
+                Console.WriteLine("                     Account ID : " + account.ID);
+                Console.WriteLine("                     Balance : " + account.Balance);
+                j++;
+                Console.WriteLine("\n\n");
+
+            }
+            Console.WriteLine("\n\n");
+            i++;
+        }
     }
 }
 
-void InputAndValidateAccount(Bank currentUsersBank, ref string AccountID)
+void InputAndValidateCustomer(Bank currentUsersBank, ref string customerID)
 {
+    Console.WriteLine("Please Enter Customer ID");
+
+    bool isCorrectCustomer = false;
+
+    while (!isCorrectCustomer)
+    {
+        customerID = Console.ReadLine();
+
+        if (ValidationServices.ValidateCustomer(currentUsersBank, customerID))
+        {
+            isCorrectCustomer = true;
+        }
+        else
+        {
+            Console.WriteLine("Please Enter valid Customer ID");
+        }
+
+    }
+}
+void InputAndValidateAccountId(User currentUsersAccount, ref string accountId)
+{
+    Console.WriteLine("Enter your account Id");
 
     bool isCorrectAccount = false;
-
+    
     while (!isCorrectAccount)
     {
-        AccountID = Console.ReadLine();
+       
 
-        if (ValidationServices.ValidateAccount(currentUsersBank, AccountID))
+        accountId = Console.ReadLine();
+
+        if (ValidationServices.ValidateAccount(currentUsersAccount, accountId))
         {
             isCorrectAccount = true;
         }
         else
         {
-            Console.WriteLine("Please Enter valid Account Id");
+            Console.WriteLine("Please Enter valid Account ID");
         }
 
     }
 }
 
-void WithdrawAmount(Customer customer)
+void WithdrawAmount(Account customerAccount)
 {
     Console.WriteLine("Enter amount to Debit");
     double moneyToWithdraw = Convert.ToDouble(Console.ReadLine());
-    StaffService.ValidateAmountForDebit(customer, moneyToWithdraw);
-    CustomerService.Withdraw(customer, moneyToWithdraw);
+    StaffService.ValidateAmountForDebit(customerAccount, moneyToWithdraw);
+    CustomerService.Withdraw(customerAccount, moneyToWithdraw);
     Console.WriteLine("Amount withdrawn successfully");
-    Console.WriteLine("Current Balance :" + customer.Balance);
+    Console.WriteLine("Current Balance :" + customerAccount.Balance);
 
 }
 
-void TransferAmount(Customer sender)
+void TransferAmount(User sender,Account senderAccount)
 {
     Console.WriteLine("Enter recievers Bank Name");
     
@@ -578,17 +616,28 @@ void TransferAmount(Customer sender)
 
     Bank receiversBank = AdminServices.GetBank(receiversBankName, AllBanks);
     
-    Bank SendersBank = AdminServices.GetBank(sender.BankName, AllBanks);
+    Bank sendersBank = AdminServices.GetBank(sender.BankName, AllBanks);
 
-    if (!StaffService.ValidateTransaction(receiversBank, SendersBank.currency))
+    if (!StaffService.ValidateTransaction(receiversBank, sendersBank.currency))
     { 
         Console.WriteLine("Cannot perform the transaction");
-        Console.WriteLine(receiversBankName + " not accepting amount sent in " + SendersBank.currency);
+        Console.WriteLine(receiversBankName + " not accepting amount sent in " + sendersBank.currency);
     }
 
-    Console.WriteLine("Enter recievers account number");
-    string receiversAccountNumber = Console.ReadLine();
-    Customer receiversAccount = StaffService.GetAccount(receiversBank, receiversAccountNumber);
+    Console.WriteLine("Enter Receiver customer ID");
+
+    string receiverCustomerID = "";
+
+    InputAndValidateCustomer(receiversBank, ref receiverCustomerID);
+
+    User receiver = receiversBank.AllUsers[receiverCustomerID];
+
+    string receiverAccountID = "";
+
+    InputAndValidateAccountId(receiver , ref receiverAccountID);
+
+    Account receiverAccount = receiversBank.AllAccounts[receiverAccountID];
+
     Console.WriteLine("Enter amount to transfer");
     double moneyToTransfer = Convert.ToDouble(Console.ReadLine());
     Console.WriteLine("Enter Transaction Type");
@@ -601,7 +650,7 @@ void TransferAmount(Customer sender)
 
     double transactionCharge = 0;
 
-    GenerateTransactionCharge(ref transactionCharge, SendersBank.Name, receiversBankName, transactionType,moneyToTransfer,SendersBank);
+    GenerateTransactionCharge(ref transactionCharge, receiversBankName, transactionType,moneyToTransfer,sendersBank);
 
     double receiverAccountAmountCredited = moneyToTransfer;
 
@@ -609,13 +658,14 @@ void TransferAmount(Customer sender)
 
     double senderAccountAmountDebited = moneyToTransfer;
 
-    if (!StaffService.ValidateAmountForDebit(sender, moneyToTransfer))
+    if (!StaffService.ValidateAmountForDebit(senderAccount, moneyToTransfer))
     {
         Console.WriteLine("Insufficient Funds");
     }
     else
     {
-        CustomerService.Transfer(sender, receiversAccount, SendersBank, receiversBank, moneyToTransfer, transactionCharge, senderAccountAmountDebited, ref receiverAccountAmountCredited);
+        CustomerService.Transfer(senderAccount , receiverAccount, sendersBank, receiversBank, moneyToTransfer, transactionCharge, senderAccountAmountDebited, ref receiverAccountAmountCredited);
+        CustomerService.GenerateTransactionInfo(senderAccount , receiverAccount, sendersBank, receiversBank, senderAccountAmountDebited, receiverAccountAmountCredited, sender.FirstName, receiver.FirstName);
     }
 
 }
@@ -654,9 +704,9 @@ void SelectTransactionType(ref string transactionType)
     }
 }
 
-void GenerateTransactionCharge(ref double transactionCharge, string senderBankName, string receiversBankName,string transactionType,double moneyToTransfer, Bank senderBank)
+void GenerateTransactionCharge(ref double transactionCharge, string receiversBankName,string transactionType,double moneyToTransfer, Bank senderBank)
 {
-    if (senderBankName == receiversBankName)
+    if (senderBank.Name == receiversBankName)
     {
         if (transactionType == "RTGS")
         {
@@ -683,34 +733,72 @@ void GenerateTransactionCharge(ref double transactionCharge, string senderBankNa
 
  void CreateNewAccount(Bank staffBank)
 {
-    Console.WriteLine("Creating new account");
-    Console.WriteLine("Enter First Name");
-    string firstName = Console.ReadLine();
-    Console.WriteLine("Enter Last Name");
-    string lastName = Console.ReadLine();
+    Boolean isValidStaffOption = false;
 
-    string email = "";
+    string AccountType = "";
 
-    ValidateEmail(ref email);
+    while (!isValidStaffOption)
+    {
+        Console.WriteLine("1.Create new Customer Account.\n2.Create Account for Existing Customer");
+        string staffOption = Console.ReadLine();
+        switch (staffOption)
+        {
+            case "1":
+                Console.WriteLine("Creating new account");
+                Console.WriteLine("Enter First Name");
+                string firstName = Console.ReadLine();
+                Console.WriteLine("Enter Last Name");
+                string lastName = Console.ReadLine();
 
-    string password = "";
+                string email = "";
 
-    ValidatePassword(ref password);
+                ValidateEmail(ref email);
 
-    StaffService.CreateCustomerAccount(firstName, lastName, email, password, staffBank);
+                string password = "";
 
-    Console.WriteLine("Account created successfully");
+                ValidatePassword(ref password);
+
+                StaffService.CreateAccountForNewCustomer(firstName, lastName, email, password, staffBank);
+
+                Console.WriteLine("Account created successfully");
+                isValidStaffOption= true;
+                break;
+            case "2":
+
+             /*   Console.WriteLine("Please Enter your Customer ID");*/
+
+                string customerID = "";
+
+                InputAndValidateCustomer(staffBank, ref customerID);
+
+                User currentUsersAccount = staffBank.AllUsers[customerID];
+
+                StaffService.CreateAccountForExistingCustomer(currentUsersAccount,staffBank);
+
+                Console.WriteLine("Another account created for " + currentUsersAccount.FirstName + "successfully\n");
+
+                isValidStaffOption = true;
+                break;
+           default: Console.WriteLine("Invalid choice\nPlease enter a valid choice");
+                break;
+
+        }
+
+    }
+
 }
 
-void UpdateAccount(Bank staffBank)
+void UpdateCustomer(Bank staffBank)
 {
     Console.WriteLine("Updating account");
 
-    Console.WriteLine("Enter the ID of the account to update");
+    Console.WriteLine("Please Enter Customer ID");
 
-    string accountIDToUpdate = Console.ReadLine();
+    string CustomerID = "";
 
-    Customer accountToUpdate = staffBank.CustomerAccounts[accountIDToUpdate];
+    InputAndValidateCustomer(staffBank, ref CustomerID);
+
+    User CustomerToUpdate = staffBank.AllUsers[CustomerID];
 
     Console.WriteLine("Select the fields to update");
 
@@ -726,25 +814,25 @@ void UpdateAccount(Bank staffBank)
         {
             case "1":
                 Console.WriteLine("Enter new first name");
-                accountToUpdate.FirstName = Console.ReadLine();
+                CustomerToUpdate.FirstName = Console.ReadLine();
                 Console.WriteLine("First Name updated successfully");
                 correctOptionSelected = true;
                 break;
             case "2":
                 Console.WriteLine("Enter new Last name");
-                accountToUpdate.LastName = Console.ReadLine();
+                CustomerToUpdate.LastName = Console.ReadLine();
                 Console.WriteLine("Last Name updated successfully");
                 correctOptionSelected = true;
                 break;
             case "3":
                 Console.WriteLine("Enter new email");
-                accountToUpdate.Email = Console.ReadLine();
+                CustomerToUpdate.Email = Console.ReadLine();
                 Console.WriteLine("email updated successfully");
                 correctOptionSelected = true;
                 break;
             case "4":
                 Console.WriteLine("Enter new password");
-                accountToUpdate.Password = Console.ReadLine();
+                CustomerToUpdate.Password = Console.ReadLine();
                 Console.WriteLine("Password updated successfully");
                 correctOptionSelected = true;
                 break;
@@ -753,6 +841,58 @@ void UpdateAccount(Bank staffBank)
                 break;
         }
     }
+}
+
+void DeleteAccount(Bank staffBank)
+{
+    Boolean isValidStaffOption = false;
+
+    while (isValidStaffOption)
+    {
+        Console.WriteLine("1.Delete Customer Record.\n2.Delete single account of Existing Customer");
+
+        string staffOption = Console.ReadLine();
+        
+        switch (staffOption)
+        {
+            case "1":
+
+                string customerID = "";
+
+                InputAndValidateCustomer(staffBank, ref customerID);
+
+                User customer = staffBank.AllUsers[customerID];
+
+                StaffService.DeleteCustomer(staffBank, customer);
+
+                Console.WriteLine("Customer Record deleted successfully");
+
+                isValidStaffOption = true;
+                break;
+            case "2":
+
+                string customerId = "";
+
+                InputAndValidateCustomer(staffBank, ref customerId);
+
+                User currentCustomer = staffBank.AllUsers[customerId];
+
+                string accountIDToDelete = "";
+
+                InputAndValidateAccountId(currentCustomer, ref accountIDToDelete);
+
+                StaffService.DeleteAccount(staffBank, currentCustomer, accountIDToDelete);
+
+                Console.WriteLine("Account deleted successfully");
+
+                isValidStaffOption = true;
+                break;
+            default:
+                Console.WriteLine("Invalid choice\nPlease enter a valid choice");
+                break;
+        }
+    }
+    
 }
 
 void AddCurrencyToAcceptedCurrencies(string bankID)
@@ -795,10 +935,10 @@ void AddServiceChargeForTransferringBank(Bank staffBank)
    Console.WriteLine("Charges updates successfully");
 }
 
-void RevertTransaction(Customer sender)
+void RevertTransaction(Account sender)
 {
 
-    Console.WriteLine("List of Transactions of" + sender.FirstName + "are \n");
+    Console.WriteLine("List of Transactions of are \n");
 
     foreach (Transaction transactions in sender.Transactions.Values)
     {
@@ -821,13 +961,13 @@ void RevertTransaction(Customer sender)
 
     CustomerService.Deposit(sender, SenderTransaction.MoneyTransferred);
 
-    Console.WriteLine("Successfully reverted transaction in " + sender.FirstName);
+    Console.WriteLine("Successfully reverted transaction in sender");
 
     //revert receiver transaction id
  
     string receiverTransactionId = SenderTransaction.ReceiverTransactionID;
 
-    Customer receiver = SenderTransaction.Receiver;
+    Account receiver = SenderTransaction.Receiver;
 
     Transaction ReceiverTransaction = receiver.Transactions[receiverTransactionId];
 

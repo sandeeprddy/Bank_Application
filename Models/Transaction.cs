@@ -9,15 +9,15 @@ namespace Models
     public class Transaction
     {
         public string Id { get; set; }
-        public Customer Sender { get; set; }
-        public Customer Receiver { get; set; }
+        public Account Sender { get; set; }
+        public Account Receiver { get; set; }
         public double MoneyTransferred { get; set; }
 
         public string TransactionInfo { get; set; }
 
         public string ReceiverTransactionID { get; set; }
 
-        public Transaction(string id, Customer sender, Customer receiver, double moneyTransferred, String receiverTransactionID)
+        public Transaction(string id, Account sender, Account receiver, double moneyTransferred, String receiverTransactionID)
         {
             Id = id;
             Sender = sender;

@@ -11,17 +11,44 @@ namespace AllServices
     public class StaffService
     {
         
-        public static void CreateCustomerAccount(string firstName, string lastName,string email, string password, Bank bank)
+        public static void CreateAccountForNewCustomer(string firstName, string lastName,string email, string password, Bank bank)
         {
             Customer newCustomerAccount = new(firstName, lastName, email, password,bank.Name);
 
-            bank.CustomerAccounts.Add(newCustomerAccount.ID, newCustomerAccount);
+            bank.AllUsers.Add(newCustomerAccount.ID, newCustomerAccount);
+
+            Account newAccount = new(firstName);
+
+            bank.AllAccounts.Add(newAccount.ID, newAccount);
+
+            newCustomerAccount.AccountIDs.Add(newAccount.ID);
+        }
+
+        public static void CreateAccountForExistingCustomer(User customer, Bank bank)
+        {
+            Account newAccount = new(customer.FirstName);
+
+            bank.AllAccounts.Add(newAccount.ID, newAccount);
+
+            customer.AccountIDs.Add(newAccount.ID);
 
         }
-        
-        public static void DeleteAccount(Bank bank,string accountIDToDelete)
-        { 
-            bank.CustomerAccounts.Remove(accountIDToDelete);
+
+        public static void DeleteCustomer(Bank bank, User customerToDelete)
+        {
+            foreach (string accounts in customerToDelete.AccountIDs)
+            {
+                bank.AllAccounts.Remove(accounts);
+            }
+
+            bank.AllUsers.Remove(customerToDelete.ID);
+        }
+       
+        public static void DeleteAccount(Bank bank,User customer,string accountIDToDelete)
+        {
+            customer.AccountIDs.Remove(accountIDToDelete);
+
+            bank.AllAccounts.Remove(accountIDToDelete);
         }
 
       
@@ -39,7 +66,7 @@ namespace AllServices
          }
 
         
-        public static void ViewTransaction(Customer customer)
+        public static void ViewTransaction(Account customer)
         {
             foreach (Transaction transaction in customer.Transactions.Values)
             {
@@ -48,9 +75,9 @@ namespace AllServices
         }
 
         
-        public static Boolean ValidateAmountForDebit(Customer customer, double amountToWithdraw)
+        public static Boolean ValidateAmountForDebit(Account customerAccount, double amountToWithdraw)
         {
-            return (amountToWithdraw <= customer.Balance);
+            return (amountToWithdraw <= customerAccount.Balance);
         }
 
         
@@ -60,9 +87,9 @@ namespace AllServices
         }
 
         
-        public static Customer GetAccount(Bank receiversBank, string accountID)
+      /*  public static Customer GetAccount(Bank receiversBank, string accountID)
         {
             return receiversBank.CustomerAccounts[accountID];
-        }
+        }*/
     }
 }

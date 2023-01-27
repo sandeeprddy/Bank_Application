@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Models;
+using Models.Enum_Types;
 
 namespace Bank_Application
 {
@@ -24,15 +25,20 @@ namespace Bank_Application
         }
 
         
-        public static Boolean ValidateAccount(Bank currentUsersBank, string accountID)
+        public static Boolean ValidateCustomer(Bank currentUsersBank, string customerID)
         {
-            return (currentUsersBank.CustomerAccounts.ContainsKey(accountID));
+            return (currentUsersBank.AllUsers.ContainsKey(customerID) && (currentUsersBank.AllUsers[customerID].UserType.Equals(UserTypes.Types.Customer)));
         }
 
-        
+        public static Boolean ValidateAccount(User user, string accountID)
+        {
+            return (user.AccountIDs.Contains(accountID));
+        }
+
+
         public static Boolean ValidateStaff(string Id, string password, Bank bank)
         {
-            return (bank.StaffAccounts.ContainsKey(Id) && bank.StaffAccounts[Id].Password == password);
+            return (bank.AllUsers.ContainsKey(Id) && bank.AllUsers[Id].Password == password && (bank.AllUsers[Id].UserType.Equals(UserTypes.Types.Staff)));
         }
 
         
@@ -56,7 +62,7 @@ namespace Bank_Application
             return (allBanks[BankId].AcceptedCurrencies.ContainsKey(currency.ToUpper()));
         }
 
-        public static Boolean ValidateTransaction(Customer customer, string transactionId)
+        public static Boolean ValidateTransaction(Account customer, string transactionId)
         {
            return (customer.Transactions.ContainsKey(transactionId));
         }

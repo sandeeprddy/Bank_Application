@@ -33,7 +33,7 @@ namespace AllServices
         { 
             Staff newStaffAccount = new(firstName, lastName, email, password, targetBank.Name);
 
-            targetBank.StaffAccounts.Add(newStaffAccount.ID, newStaffAccount);
+            targetBank.AllUsers.Add(newStaffAccount.ID, newStaffAccount);
 
         }
 

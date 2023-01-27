@@ -5,26 +5,25 @@ namespace AllServices
 {
     public  class CustomerService
     {
- 
-        public  static void Deposit(Customer customer, double money)
+        public  static void Deposit(Account customerAccount, double money)
         {
-            customer.Balance += money;
+            customerAccount.Balance += money;
         }
 
-        public static void Withdraw(Customer customer, double amount)
+        public static void Withdraw(Account customerAccount, double amount)
         {
-             customer.Balance -= amount;
+             customerAccount.Balance -= amount;
         }
        
-        public static void ViewTransaction(Customer customer)
+        public static void ViewTransaction(Account customerAccount)
             {
-                foreach (Transaction transaction in customer.Transactions.Values)
+                foreach (Transaction transaction in customerAccount.Transactions.Values)
                 {
                     Console.WriteLine(transaction.TransactionInfo);
                 };
         }
 
-        public static void Transfer(Customer sender, Customer receiver, Bank senderBank, Bank receiverBank, double moneyToTransfer, double transactionCharge,double senderAccountAmountDebited, ref double receiverAccountAmountCredited)
+        public static void Transfer(Account sender,Account receiver, Bank senderBank, Bank receiverBank, double moneyToTransfer, double transactionCharge,double senderAccountAmountDebited, ref double receiverAccountAmountCredited)
         {
            Withdraw(sender, moneyToTransfer);
 
@@ -67,31 +66,30 @@ namespace AllServices
                 receiver.Balance += (moneyToTransfer - transactionCharge);
             }
 
-            GenerateTransactionInfo(sender, receiver, senderBank, receiverBank, senderAccountAmountDebited, receiverAccountAmountCredited);
-
+           
         }
 
-        public static void GenerateTransactionInfo(Customer sender, Customer receiver, Bank senderBank, Bank receiverBank, double senderAccountAmountDebited, double receiverAccountAmountCredited)
+        public static void GenerateTransactionInfo(Account sender, Account receiver, Bank senderBank, Bank receiverBank, double senderAccountAmountDebited, double receiverAccountAmountCredited, string senderFirstName, string receiverFirstName)
         {
-            string SenderTransactionID = "TXN" + senderBank.ID + sender.ID + DateTime.Now.ToString("");
+            string senderTransactionID = "TXN" + senderBank.ID + sender.ID + DateTime.Now.ToString("");
 
-            string ReceiverTransactionID = "TXN" + (receiverBank).ID + receiver.ID + DateTime.Now.ToString("");
+            string receiverTransactionID = "TXN" + (receiverBank).ID + receiver.ID + DateTime.Now.ToString("");
 
-            Transaction SenderTransaction = new(SenderTransactionID, sender, receiver, senderAccountAmountDebited, ReceiverTransactionID);
+            Transaction SenderTransaction = new(senderTransactionID, sender, receiver, senderAccountAmountDebited, receiverTransactionID);
            
-            Transaction ReceiverTransaction = new(ReceiverTransactionID, sender, receiver, receiverAccountAmountCredited, SenderTransactionID);
+            Transaction ReceiverTransaction = new(receiverTransactionID, sender, receiver, receiverAccountAmountCredited, senderTransactionID);
 
-            sender.Transactions.Add(SenderTransactionID, SenderTransaction);
+            sender.Transactions.Add(senderTransactionID, SenderTransaction);
 
-            receiver.Transactions.Add(ReceiverTransactionID, ReceiverTransaction);
+            receiver.Transactions.Add(receiverTransactionID, ReceiverTransaction);
 
-            string senderTransactionInfo = sender.FirstName + " sent " + senderAccountAmountDebited + senderBank.currency + " to " + receiver.FirstName;
+            string senderTransactionInfo = senderFirstName + " sent " + senderAccountAmountDebited + senderBank.currency + " to " + receiverFirstName;
 
-            string receiverTransactionInfo = receiver.FirstName + " received " + receiverAccountAmountCredited + receiverBank.currency + " from " + sender.FirstName;
+            string receiverTransactionInfo = receiverFirstName + " received " + receiverAccountAmountCredited + receiverBank.currency + " from " + senderFirstName;
 
-            sender.Transactions[SenderTransactionID].TransactionInfo = senderTransactionInfo;
+            sender.Transactions[senderTransactionID].TransactionInfo = senderTransactionInfo;
 
-            receiver.Transactions[ReceiverTransactionID].TransactionInfo = receiverTransactionInfo;
+            receiver.Transactions[receiverTransactionID].TransactionInfo = receiverTransactionInfo;
 
         }
     }

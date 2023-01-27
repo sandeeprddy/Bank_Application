@@ -3,25 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Models.Enum_Types;
 
 namespace Models
 {
-    public class Customer : Account 
+    public class Customer : User 
     {
-        public double Balance { get; set; }
-
-        public Dictionary<string, Transaction> Transactions = new();
-
-        public Customer(string firstName, string lastName, string email, string password, string bankName)
+        public Customer(string FirstName, string LastName, string Email, string Password, string BankName) : base()
         {
-            this.ID = firstName[..3] + DateTime.Now.ToString("");
-            this.FirstName = firstName;
-            this.LastName = lastName;
-            this.Email = email;
-            this.Password = password;
-            this.BankName = bankName;
-            this.Balance = 0;
+            this.ID = FirstName[..3] + DateTime.Now.ToString("");
+            this.FirstName = FirstName;
+            this.LastName = LastName;
+            this.Email = Email;
+            this.Password = Password;
+            this.BankName = BankName;
+            this.UserType = UserTypes.Types.Customer;
+            this.AccountIDs = new List<string>();
         }
-    
+
     }
 }
